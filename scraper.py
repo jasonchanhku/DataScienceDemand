@@ -1,12 +1,14 @@
 from selenium import webdriver
 import time
+
+
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
 driver = webdriver.Chrome(options=options)
 driver.get('https://www.glassdoor.com/index.htm')
 
 
-driver.find_element_by_css_selector('#KeywordSearch').send_keys('Art Director')
+driver.find_element_by_css_selector('#KeywordSearch').send_keys('Housekeeper')
 
 driver.find_element_by_css_selector('#LocationSearch').clear()
 driver.find_element_by_css_selector('#LocationSearch').send_keys('Hong Kong')
@@ -22,9 +24,12 @@ end = True
 while end:
     links = driver.find_elements_by_css_selector('#MainCol .flexbox .jobLink')
 
-    for link in links:
+    for i,link in enumerate(links):
         time.sleep(2)
         link.click()
+        print(link.text)
+        print(link.find_elements_by_xpath('//div[@class="flexbox empLoc"]')[i].text)
+        print(driver.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
         time.sleep(2)
         try:
             # to cancel the annoying pop up that tries to prevent scrapers
