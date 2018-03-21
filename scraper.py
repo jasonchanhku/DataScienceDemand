@@ -28,14 +28,17 @@ while end:
         time.sleep(2)
         link.click()
         print(link.text)
-        print(link.find_elements_by_xpath('//div[@class="flexbox empLoc"]')[i].text)
-        print(driver.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
-        time.sleep(2)
         try:
             # to cancel the annoying pop up that tries to prevent scrapers
             driver.find_element_by_class_name('mfp-close').click()
         except:
             None
+        print(link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div')[i].text)
+
+        time.sleep(10)
+        print(link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
+        print('\n')
+        time.sleep(2)
 
     # To prevent selenium returning stalemate element
     # https://stackoverflow.com/questions/45002008/selenium-stale-element-reference-element-is-not-attached-to-the-page
