@@ -1,25 +1,28 @@
 from selenium import webdriver
 import time
 
-
+# get webdriver up and running
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
 driver = webdriver.Chrome(options=options)
 driver.get('https://www.glassdoor.com/index.htm')
 
-
+# To type in job title and location
 driver.find_element_by_css_selector('#KeywordSearch').send_keys('Housekeeper')
-
 driver.find_element_by_css_selector('#LocationSearch').clear()
 driver.find_element_by_css_selector('#LocationSearch').send_keys('Hong Kong')
-
 driver.find_element_by_css_selector('#HeroSearchButton').click()
 
-num_pages = driver.find_elements_by_css_selector('.page a')
-# print(len(links))
-# driver.get(links[0].get_attribute('href'))
 
+# Initializer for the while loop. Will be false once reaches end of page.
 end = True
+
+# Initialize lists to collect data
+job_title = []
+company = []
+location = []
+description = []
+rating = []
 
 while end:
     links = driver.find_elements_by_css_selector('#MainCol .flexbox .jobLink')
@@ -27,16 +30,32 @@ while end:
     for i,link in enumerate(links):
         time.sleep(2)
         link.click()
-        print(link.text)
+        print('Title: ', link.text)
+
         try:
             # to cancel the annoying pop up that tries to prevent scrapers
             driver.find_element_by_class_name('mfp-close').click()
         except:
-            None
-        print(link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div')[i].text)
+            pass
 
+        print('Company: ', link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[i].text)
+        # Below has issue, those ith HOT or NEW won't be read as posted date
+        #print('Posted: ',link.find_elements_by_xpath('//span[@class="minor"]')[i].text)
+        print('Link: ', link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[i].get_attribute('href'))
         time.sleep(10)
-        print(link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
+
+        try:
+            print('Rating: ', link.find_element_by_xpath('//span[@class="compactStars margRtSm"]').text)
+        except:
+            print('Rating: NULL')
+            pass
+
+        try:
+            print('Descrption: ',link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
+        except:
+            time.sleep(10)
+            print('Descrption: ', link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
+            pass
         print('\n')
         time.sleep(2)
 
@@ -53,4 +72,3 @@ print('Data successfully scraped')
 time.sleep(5)
 driver.close()
 
-# To fix, there are actually > 4 pages upon reaching the 5th...
