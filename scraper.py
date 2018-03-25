@@ -1,5 +1,6 @@
 from selenium import webdriver
 import time
+import pandas as pd
 
 # get webdriver up and running
 options = webdriver.ChromeOptions()
@@ -40,7 +41,7 @@ while end:
         time.sleep(2)
         link.click()
         # Col 1: Job Title
-        print('Title: ', link.text)
+        job_titles.extend([link.text])
 
         try:
             # to cancel the annoying pop up that tries to prevent scrapers
@@ -49,62 +50,84 @@ while end:
             pass
 
         # Col 2: Company Name
-        print('Company: ', link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[i].text)
+        companies.extend([link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[i].text])
 
         # Below has issue, those ith HOT or NEW won't be read as posted date
-        #print('Posted: ',link.find_elements_by_xpath('//span[@class="minor"]')[i].text)
+        # print('Posted: ',link.find_elements_by_xpath('//span[@class="minor"]')[i].text)
 
         # Col 3: Link to the job
-        print('Link: ', link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[i].get_attribute('href'))
+        job_links.extend([link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[i].get_attribute('href')])
         time.sleep(10)
 
         # Col 4: Ratings
         try:
-            print('Rating: ', link.find_element_by_xpath('//span[@class="compactStars margRtSm"]').text)
+            ratings.extend([link.find_element_by_xpath('//span[@class="compactStars margRtSm"]').text])
         except:
-            print('Rating: NULL')
+            ratings.extend([''])
             pass
 
         # Tab 1: Job description
         # Col 5: Job description
         try:
-            print('Descrption: ',link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
+            descriptions.extend([link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module '
+                                                            'pad noMargBot"]').text])
         except:
             time.sleep(10)
-            print('Descrption: ', link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
+            descriptions.extend([link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module '
+                                                            'pad noMargBot"]').text])
             pass
 
         # Tab 2: Company Tab
-        driver.find_element_by_xpath('//li[@data-target = "CompanyContainer"]').click()
-        # Col 6: Size
-        print('Size: ', link.find_element_by_xpath('//div[@class = "info flexbox row"]/div[2]/span').text)
-        # Col 7: Founded
-        print('Founded in: ', link.find_element_by_xpath('//div[@class = "info flexbox row"]/div[3]/span').text)
-        # Col 8: Type
-        print('Type: ', link.find_element_by_xpath('//div[@class = "info flexbox row"]/div[4]/span').text)
-        # Col 9: Industry
-        print('Industry: ', link.find_element_by_xpath('//div[@class = "info flexbox row"]/div[5]/span').text)
-        # Col 10: Revenue
-        print('Revenue: ', link.find_element_by_xpath('//div[@class = "info flexbox row"]/div[6]/span').text)
-        print('\n')
+
+        try:
+            driver.find_element_by_xpath('//li[@data-target = "CompanyContainer"]').click()
+
+            # Col 6: Size
+            sizes.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Size"]/'
+                                                     'span[@class = "value"]').text])
+
+            # Col 7: Founded
+            founded_years.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Founded"]/'
+                                                             'span[@class = "value"]').text])
+            # Col 8: Type
+            types.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Type"]/'
+                                                     'span[@class = "value"]').text.strip("Company - ")])
+
+            # Col 9: Industry
+            industries.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Industry"]/'
+                                                          'span[@class = "value"]').text])
+
+            # Col 10: Revenue
+            revenues.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Revenue"]/'
+                                                        'span[@class = "value"]').text])
+        except:
+            sizes.extend([''])
+            founded_years.extend([''])
+            types.extend([''])
+            industries.extend([''])
+            revenues.extend([''])
+            pass
 
         # Tab 3: Rating Tab (only this tab needs try except)
         try:
             driver.find_element_by_xpath('//li[@data-target = "RatingContainer"]').click()
             # Col 11: CEO
-            print('CEO: ', link.find_element_by_xpath('//div[@class = "tbl gfxContainer"]/div[3]/div[@class="tbl"]/'
-                                                      'div[2]/div[1]').text)
+            CEOs.extend([link.find_element_by_xpath('//div[@class = "tbl gfxContainer"]/div[3]/div[@class="tbl"]'
+                                                    '/div[2]/div[1]').text])
 
             # Col 12: Recommend
-            print('Recommend: ', link.find_element_by_xpath('//div[@id = "EmpStats_Recommend"]').get_attribute('data-percentage'))
+            recommends.extend([link.find_element_by_xpath('//div[@id = "EmpStats_Recommend"]').
+                              get_attribute('data-percentage')])
 
             # Col 13: Approve of CEO
-            print('Approve of CEO: ', link.find_element_by_xpath('//div[@id = "EmpStats_Approve"]').get_attribute('data-percentage'))
+            approves.extend([link.find_element_by_xpath('//div[@id = "EmpStats_Approve"]').
+                            get_attribute('data-percentage')])
         except:
+            CEOs.extend([''])
+            recommends.extend([''])
+            approves.extend([''])
             pass
-            # Col 11 - 13 null inputs
 
-        print('\n')
         time.sleep(2)
 
     # To prevent selenium returning stalemate element
@@ -116,6 +139,53 @@ while end:
         break
 
 print('Data successfully scraped')
+
+df = pd.DataFrame()
+
+print(job_titles)
+
+print(companies)
+
+print(job_links)
+
+print(ratings)
+
+print(descriptions)
+
+print(sizes)
+
+print(founded_years)
+
+print(types)
+
+print(industries)
+
+print(revenues)
+
+print(CEOs)
+
+print(recommends)
+
+print(approves)
+
+df['Title'] = job_titles
+df['Company'] = companies
+df['Link'] = job_links
+df['Rating'] = ratings
+df['Job_Description'] = descriptions
+df['Size'] = sizes
+df['Founded'] = founded_years
+df['Company_Type'] = types
+df['Industry'] = industries
+df['Revenue'] = revenues
+df['CEO'] = CEOs
+df['Recommend'] = recommends
+df['Approve'] = approves
+
+df.to_csv('glassdoor.csv', index=False)
+
+print('Dataframe successfully constructed and saved')
+
 
 time.sleep(5)
 driver.close()
