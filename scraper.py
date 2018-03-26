@@ -38,10 +38,12 @@ cols = ['Title', 'Company', 'Link', 'Rating', 'Job_Description', 'Size', 'Founde
 
 df = pd.DataFrame(columns=cols)
 
+i = 0
+
 while end:
     links = driver.find_elements_by_css_selector('#MainCol .flexbox .jobLink')
 
-    for i, link in enumerate(links):
+    for j, link in enumerate(links):
         time.sleep(2)
         link.click()
         # Col 1: Job Title
@@ -55,13 +57,13 @@ while end:
             pass
 
         # Col 2: Company Name
-        companies.extend([link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[i].text])
+        companies.extend([link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[j].text.replace(" – Hong Kong", "")])
         print('Company: ', companies[i])
         # Below has issue, those ith HOT or NEW won't be read as posted date
         # print('Posted: ',link.find_elements_by_xpath('//span[@class="minor"]')[i].text)
 
         # Col 3: Link to the job
-        job_links.extend([link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[i].get_attribute('href')])
+        job_links.extend([link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[j].get_attribute('href')])
         time.sleep(5)
 
         # Col 4: Ratings
@@ -103,7 +105,7 @@ while end:
 
             # Col 8: Type
             types.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Type"]/'
-                                                     'span[@class = "value"]').text.strip("Company - ")])
+                                                     'span[@class = "value"]').text.replace("Company - ", "")])
 
             print('Type: ', types[i])
 
@@ -176,6 +178,8 @@ while end:
             'Approve': approves[i]
 
         }, ignore_index=True)
+
+        i += 1
 
         time.sleep(2)
 
