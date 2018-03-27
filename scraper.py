@@ -1,6 +1,7 @@
 from selenium import webdriver
 import time
 import pandas as pd
+import unidecode
 
 # get webdriver up and running
 options = webdriver.ChromeOptions()
@@ -17,38 +18,25 @@ driver.find_element_by_css_selector('#HeroSearchButton').click()
 # Initializer for the while loop. Will be false once reaches end of page.
 end = True
 
-# Initialize lists to collect data before putting together a data frame
+# Initialize columns for data frame before putting together a data frame
 # Long term plan is to automate this with Morph.io and pull data using API
-job_titles = []
-companies = []
-job_links = []
-ratings = []
-descriptions = []
-sizes = []
-founded_years = []
-types = []
-industries = []
-revenues = []
-CEOs = []
-recommends = []
-approves = []
 
 cols = ['Title', 'Company', 'Link', 'Rating', 'Job_Description', 'Size', 'Founded', 'Company_Type', 'Industry',
         'Revenue', 'CEO', 'Recommend', 'Approve']
 
 df = pd.DataFrame(columns=cols)
 
-i = 0
-
 while end:
     links = driver.find_elements_by_css_selector('#MainCol .flexbox .jobLink')
+
+    # j is used to enumerate the links that contains the company names, ratings, and the job links
 
     for j, link in enumerate(links):
         time.sleep(2)
         link.click()
         # Col 1: Job Title
-        job_titles.extend([link.text])
-        print('Title: ', job_titles[i])
+        job_titles = link.text
+        print('Title: ', job_titles)
 
         try:
             # to cancel the annoying pop up that tries to prevent scrapers
@@ -57,80 +45,81 @@ while end:
             pass
 
         # Col 2: Company Name
-        companies.extend([link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[j].text.replace(" – Hong Kong", "")])
-        print('Company: ', companies[i])
+        # Decoding some accents
+        companies = unidecode.unidecode(link.find_elements_by_xpath('//div[@class="flexbox empLoc"]/div[1]')[j].text.split("–")[0].strip())
+        print('Company: ', companies)
         # Below has issue, those ith HOT or NEW won't be read as posted date
         # print('Posted: ',link.find_elements_by_xpath('//span[@class="minor"]')[i].text)
 
         # Col 3: Link to the job
-        job_links.extend([link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[j].get_attribute('href')])
+        job_links = link.find_elements_by_xpath('//div[@class="flexbox"]/div/a')[j].get_attribute('href')
         time.sleep(5)
 
         # Col 4: Ratings
         try:
-            ratings.extend([link.find_element_by_xpath('//span[@class="compactStars margRtSm"]').text])
-            print('Ratings: ', ratings[i])
+            ratings = link.find_element_by_xpath('//span[@class="compactStars margRtSm"]').text
+            print('Ratings: ', ratings)
         except:
-            ratings.extend([''])
-            print('Ratings: ', ratings[i])
+            ratings = ''
+            print('Ratings: ', ratings)
             pass
 
         # Tab 1: Job description
         # Col 5: Job description
         try:
-            descriptions.extend([link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module '
-                                                            'pad noMargBot"]').text])
+            descriptions = link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text
         except:
             time.sleep(20)
-            descriptions.extend([link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module '
-                                                            'pad noMargBot"]').text])
+            descriptions = link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text
+
             pass
 
         # Tab 2: Company Tab
         # Successfully selected xpath same level based on condition
+        # https://stackoverflow.com/questions/26963092/selecting-values-in-xpath-depending-on-values-at-same-level
         try:
             driver.find_element_by_xpath('//li[@data-target = "CompanyContainer"]').click()
 
             # Col 6: Size
-            sizes.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Size"]/'
-                                                     'span[@class = "value"]').text])
+            sizes = link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Size"]/'
+                                                     'span[@class = "value"]').text
 
-            print('Size: ', sizes[i])
+            print('Size: ', sizes)
 
             # Col 7: Founded
-            founded_years.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Founded"]/'
-                                                             'span[@class = "value"]').text])
+            founded_years = link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Founded"]/'
+                                                             'span[@class = "value"]').text
 
-            print('Founded: ', founded_years[i])
+            print('Founded: ', founded_years)
 
             # Col 8: Type
-            types.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Type"]/'
-                                                     'span[@class = "value"]').text.replace("Company - ", "")])
+            types = link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Type"]/'
+                                                     'span[@class = "value"]').text.replace("Company - ", "")
 
-            print('Type: ', types[i])
+            print('Type: ', types)
 
             # Col 9: Industry
-            industries.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Industry"]/'
-                                                          'span[@class = "value"]').text])
+            industries = link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Industry"]/'
+                                                          'span[@class = "value"]').text
 
-            print('Industry: ', industries[i])
+            print('Industry: ', industries)
 
             # Col 10: Revenue
-            revenues.extend([link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Revenue"]/'
-                                                        'span[@class = "value"]').text])
-            print('Revenue: ', revenues[i])
+            revenues = link.find_element_by_xpath('//div[@class = "infoEntity"][label[.] = "Revenue"]/'
+                                                        'span[@class = "value"]').text
+            print('Revenue: ', revenues)
 
         except:
-            sizes.extend([''])
-            print('Size: ', sizes[i])
-            founded_years.extend([''])
-            print('Founded: ', founded_years[i])
-            types.extend([''])
-            print('Type: ', types[i])
-            industries.extend([''])
-            print('Industry: ', industries[i])
-            revenues.extend([''])
-            print('Revenue: ', revenues[i])
+            sizes = ''
+            print('Size: ', sizes)
+            founded_years = ''
+            print('Founded: ', founded_years)
+            types = ''
+            print('Type: ', types)
+            industries = ''
+            print('Industry: ', industries)
+            revenues = ''
+            print('Revenue: ', revenues)
 
             pass
 
@@ -138,48 +127,45 @@ while end:
         try:
             driver.find_element_by_xpath('//li[@data-target = "RatingContainer"]').click()
             # Col 11: CEO
-            CEOs.extend([link.find_element_by_xpath('//div[@class = "tbl gfxContainer"]/div[3]/div[@class="tbl"]'
-                                                    '/div[2]/div[1]').text])
-            print('CEO: ', CEOs[i])
+            # Decoding accents in CEO name
+            CEOs = unidecode.unidecode(link.find_element_by_xpath('//div[@class = "tbl gfxContainer"]/div[3]/div[@class="tbl"]'
+                                                    '/div[2]/div[1]').text)
+            print('CEO: ', CEOs)
             # Col 12: Recommend
-            recommends.extend([link.find_element_by_xpath('//div[@id = "EmpStats_Recommend"]').
-                              get_attribute('data-percentage')])
-            print('Recommend: ', recommends[i])
+            recommends = link.find_element_by_xpath('//div[@id = "EmpStats_Recommend"]').get_attribute('data-percentage')
+            print('Recommend: ', recommends)
 
             # Col 13: Approve of CEO
-            approves.extend([link.find_element_by_xpath('//div[@id = "EmpStats_Approve"]').
-                            get_attribute('data-percentage')])
-            print('Approves: ', approves[i])
+            approves = link.find_element_by_xpath('//div[@id = "EmpStats_Approve"]').get_attribute('data-percentage')
+            print('Approves: ', approves)
             print('\n')
         except:
-            CEOs.extend([''])
-            print('CEO: ', CEOs[i])
-            recommends.extend([''])
-            print('Recommend: ', recommends[i])
-            approves.extend([''])
-            print('Approves: ', approves[i])
+            CEOs = ''
+            print('CEO: ', CEOs)
+            recommends = ''
+            print('Recommend: ', recommends)
+            approves = ''
+            print('Approves: ', approves)
             print('\n')
             pass
 
         df = df.append({
 
-            'Title': job_titles[i],
-            'Company': companies[i],
-            'Link': job_links[i],
-            'Rating': ratings[i],
-            'Job_Description': descriptions[i],
-            'Size': sizes[i],
-            'Founded': founded_years[i],
-            'Company_Type': types[i],
-            'Industry': industries[i],
-            'Revenue': revenues[i],
-            'CEO': CEOs[i],
-            'Recommend': recommends[i],
-            'Approve': approves[i]
+            'Title': job_titles,
+            'Company': companies,
+            'Link': job_links,
+            'Rating': ratings,
+            'Job_Description': descriptions,
+            'Size': sizes,
+            'Founded': founded_years,
+            'Company_Type': types,
+            'Industry': industries,
+            'Revenue': revenues,
+            'CEO': CEOs,
+            'Recommend': recommends,
+            'Approve': approves
 
         }, ignore_index=True)
-
-        i += 1
 
         time.sleep(2)
 
@@ -193,7 +179,7 @@ while end:
 
 print('Data successfully scraped')
 
-df.to_csv('glassdoor.csv', index=False)
+df.to_csv('glassdoor_final.csv', index=False)
 
 print('Dataframe successfully constructed and saved')
 
