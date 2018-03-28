@@ -3,10 +3,16 @@ import time
 import pandas as pd
 import unidecode
 
-# get webdriver up and running
+# Incognito mode
 options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
-driver = webdriver.Chrome(options=options)
+
+# Headless option
+options2 = webdriver.ChromeOptions()
+options2.add_argument('headless')
+
+# get web driver up and running
+driver = webdriver.Chrome(options=options, chrome_options=options2)
 driver.get('https://www.glassdoor.com/index.htm')
 
 # To type in job title and location
@@ -67,10 +73,10 @@ while end:
         # Tab 1: Job description
         # Col 5: Job description
         try:
-            descriptions = link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text
+            descriptions = unidecode.unidecode(link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
         except:
             time.sleep(20)
-            descriptions = link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text
+            descriptions = unidecode.unidecode(link.find_element_by_xpath('//div[@class="jobDescriptionContent desc module pad noMargBot"]').text)
 
             pass
 
@@ -179,7 +185,7 @@ while end:
 
 print('Data successfully scraped')
 
-df.to_csv('glassdoor_final.csv', index=False)
+df.to_csv('glassdoor_data.csv', index=False)
 
 print('Dataframe successfully constructed and saved')
 
