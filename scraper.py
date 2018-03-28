@@ -16,6 +16,9 @@ options2.add_argument('headless')
 driver = webdriver.Chrome(options=options, chrome_options=options2)
 driver.get('https://www.glassdoor.com/index.htm')
 
+# window size to make sure javascript parts does not get hidden
+driver.set_window_size(1280, 1024)
+
 # To type in job title and location
 driver.find_element_by_css_selector('#KeywordSearch').send_keys('Data Scientist')
 driver.find_element_by_css_selector('#LocationSearch').clear()
