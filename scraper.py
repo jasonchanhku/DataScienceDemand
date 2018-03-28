@@ -2,6 +2,7 @@ from selenium import webdriver
 import time
 import pandas as pd
 import unidecode
+import scraperwiki
 
 # Incognito mode
 options = webdriver.ChromeOptions()
@@ -156,10 +157,9 @@ while end:
             pass
 
         df = df.append({
-
+            'Link': job_links,
             'Title': job_titles,
             'Company': companies,
-            'Link': job_links,
             'Rating': ratings,
             'Job_Description': descriptions,
             'Size': sizes,
