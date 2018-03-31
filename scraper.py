@@ -2,7 +2,7 @@ from selenium import webdriver
 import time
 import pandas as pd
 import unidecode
-import scraperwiki
+import sqlite3
 
 # Incognito mode
 options = webdriver.ChromeOptions()
@@ -190,7 +190,11 @@ print('Data successfully scraped')
 
 df.to_csv('glassdoor_data.csv', index=False)
 
-print('Dataframe successfully constructed and saved')
+conn = sqlite3.connect('data.sqlite')
+df.to_sql('data', conn, if_exists='replace')
+
+print('Db successfully constructed and saved')
 
 time.sleep(5)
 driver.close()
+conn.close()
