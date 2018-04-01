@@ -45,9 +45,10 @@ Do ensure that the requirements in `requirements.txt` are met.
 
 This script will break if any of the website structure changes.
 
-## EDA
+## Exploratory Data Analysis (EDA)
 
-EDA of the data will be done and posted separately in a Jupyter notebook in this repository.
+EDA of the data will be done and posted separately in a Jupyter notebook in this repository. In the EDA, the statistical
+and visual elements of the data will be explored.
 
 ## Machine Learning
 
