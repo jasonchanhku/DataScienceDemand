@@ -36,9 +36,22 @@ This project used a combination of Web Scraping, Exploratory Data Analysis (EDA)
 and machine learning to answer the questions above.
 
 ## Web Scraping
-A script called 
+A script called `scraper.py` was written using `selenium` to handle web scraping the JavaScript heavy Glassdoor
+website. To run it just execute:
+
+> python scraper.py
+
+Do ensure that the requirements in `requirements.txt` are met.
+
+This script will break if any of the website structure changes.
 
 ## EDA
 
+EDA of the data will be done and posted separately in a Jupyter notebook in this repository.
 
 ## Machine Learning
+
+There are two ways machine learning can be applied for this project:
+
+* Clustering of jobs into user preference of predictors
+* Finding goodness of fit of user's CV and jobs available
