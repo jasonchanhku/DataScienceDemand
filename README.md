@@ -35,9 +35,12 @@ This project aims to answer the following questions:
 This project used a combination of Web Scraping, Exploratory Data Analysis (EDA)
 and machine learning to answer the questions above.
 
-## Web Scraping
+## Automated Web Scraping
 A script called `scraper.py` was written using `selenium` to handle web scraping the JavaScript heavy Glassdoor
-website. To run it just execute:
+website. The automation was done using a server space of [morph.io](www.morph.io). The automated scraper can be accessed
+[here.](https://morph.io/jasonchanhku/DataScienceDemandScraper)
+
+To manually run it on your local PC, just execute:
 
 > python scraper.py
 
