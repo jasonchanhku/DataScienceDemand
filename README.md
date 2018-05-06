@@ -59,3 +59,7 @@ There are two ways machine learning can be applied for this project:
 
 * Clustering of jobs into user preference of predictors
 * Finding goodness of fit of user's CV and jobs available
+
+# Outcome
+This project has been successfully carried out and fully documented
+in the [notebook](https://github.com/jasonchanhku/DataScienceDemand/blob/master/Data%20Science%20Demand%20in%20Hong%20Kong.ipynb) placed in repository.
